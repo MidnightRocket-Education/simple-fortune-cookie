@@ -9,5 +9,6 @@ jobs:
     - uses: actions/checkout@v4
 
     - name: Deploys to Kubernetes
-    - run: echo "${{ secrets.KUBECONFIG_PRODUCTION }}" | base64 -d > kubeconfig
-    - run: sh ci/deploy.sh kubeconfig
+      run: |
+        echo "${{ secrets.KUBECONFIG_PRODUCTION }}" | base64 -d > kubeconfig
+        sh ci/deploy.sh kubeconfig
