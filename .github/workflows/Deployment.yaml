@@ -1,0 +1,14 @@
+name: Deployment
+
+on: [workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Deploys to Kubernetes
+      run: |
+        echo "${{ secrets.KUBECONFIG_PRODUCTION }}" | base64 -d > kubeconfig
+        sh ci/deploy.sh kubeconfig
