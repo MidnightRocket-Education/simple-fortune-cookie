@@ -12,6 +12,8 @@ FROM alpine
 
 WORKDIR /app
 COPY --from=builder /app/goapp /app/
+COPY --from=builder /app/static /app/static
+COPY --from=builder /app/templates /app/templates
 
 EXPOSE 8080
 
