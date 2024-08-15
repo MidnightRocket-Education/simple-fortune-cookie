@@ -8,7 +8,7 @@ reportError() { stderr "$2"; return "$1"; }
 commandv() { command -v "$1" || reportError "$?" "Executable '$1' not found"; }
 
 
-VERSION="$(git describe --tags --match="[vV][[:digit:]]*" --always HEAD)"
+export VERSION="$(git describe --tags --match="[vV][[:digit:]]*" --always HEAD)"
 
 
 if [ -z "${VERSION+x}" ]; then
