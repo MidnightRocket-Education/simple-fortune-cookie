@@ -19,5 +19,3 @@ spec:
         name: backend-container
         ports:
           - containerPort: 9000
-
-

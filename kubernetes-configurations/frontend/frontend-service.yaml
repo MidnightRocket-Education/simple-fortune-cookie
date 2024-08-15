@@ -3,7 +3,7 @@ kind: Service
 metadata:
   labels:
     app: frontend
-  name: frontend
+  name: frontend-service
 spec:
   ports:
     - port: 8080
