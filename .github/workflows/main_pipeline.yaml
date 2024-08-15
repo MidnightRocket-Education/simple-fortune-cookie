@@ -37,3 +37,14 @@ jobs:
     - name: Test backend
       run: sh ci/test_backend.sh
 
+  docker-build-push:
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      packages: write
+    needs:
+      - build
+      - test
+    uses: ./.github/workflows/build-docker.yaml
+    with:
+      version: 1
+      user: ${{ github.actor }}
