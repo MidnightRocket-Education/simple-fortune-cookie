@@ -1,0 +1,26 @@
+services:
+  backend:
+    image: "ghcr.io/midnightrocket-education/devops-e24/simple-fortune/backend:latest"
+    build:
+      context: "backend"
+    networks:
+      backend:
+
+  frontend:
+    image: "ghcr.io/midnightrocket-education/devops-e24/simple-fortune/frontend:latest"
+    depends_on:
+      - backend
+    build:
+      context: "frontend"
+    environment:
+      BACKEND_DNS: "backend"
+    networks:
+      backend:
+      public:
+    ports:
+      - "80:8080"
+
+networks:
+  backend:
+    internal: true
+  public:
