@@ -1,4 +1,4 @@
-FROM golang:1.23.0-bookworm AS builder
+FROM golang:1.22.6-alpine AS builder
 
 WORKDIR /app
 COPY . /app
@@ -8,7 +8,7 @@ RUN cd /app && go build -o goapp
 
 
 # FROM ubuntu:latest
-FROM golang:1.23.0-bookworm
+FROM alpine
 
 WORKDIR /app
 COPY --from=builder /app/goapp /app/
