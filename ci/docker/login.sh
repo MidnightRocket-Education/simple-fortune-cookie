@@ -16,6 +16,5 @@ if [ -z "${DOCKER_USER+x}" ]; then
 fi
 
 
-VERSION="$(git describe --tags --match="[vV][[:digit:]]*" --always HEAD)"
 
 echo "$DOCKER_PASSWORD" | docker login "ghcr.io" -u "$DOCKER_USER" --password-stdin
