@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  label:
+    app: frontend
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      app: frontend
+  tempplate:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - image: ghcr.io/midnightrocket-education/devops-e24/simple-fortune/frontend:latest
+        name: frontend-container
+        ports:
+          - containerPort: 8080
+        env:
+        - name: BACKEND_DNS
+          value: backend
+
