@@ -1,2 +1,3 @@
 #!/bin/sh
-cd ./backend && go test -v
+cd ./backend
+go test -v

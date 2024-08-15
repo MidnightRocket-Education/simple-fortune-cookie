@@ -1,2 +1,3 @@
 #!/bin/sh
-cd ./frontend && go test -v
+cd ./frontend
+go test -v

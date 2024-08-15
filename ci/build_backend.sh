@@ -1,2 +1,3 @@
 #!/bin/sh
-cd ./backend && go build -o goapp
+cd ./backend
+go build -o goapp
