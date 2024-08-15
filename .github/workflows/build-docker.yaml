@@ -1,0 +1,31 @@
+name: "Build docker file"
+
+on: 
+  workflow_call:
+    inputs:
+      user:
+        description: "The username which should be used"
+        type: string
+        required: true
+      version:
+        description: "The version tag which should be used"
+        type: string
+        required: true
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-22.04
+    permissions:
+      packages: write
+    env:
+      DOCKER_PASSWORD: ${{ github.token }}
+      DOCKER_USER: ${{ inputs.user }}
+        # VERSION: ${{ inputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: login
+        run: ci/docker/login.sh
+      - name: test
+        run: echo ${{ github.repository }}
+      - name: build and push dockerfiles
+        run: ci/docker/build-and-push.sh
