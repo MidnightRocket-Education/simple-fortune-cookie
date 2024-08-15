@@ -1,4 +1,4 @@
-FROM golang:1.23.0-bookworm AS builder
+FROM golang:1.22.6-alpine AS builder
 
 WORKDIR /app
 COPY . /app
@@ -8,7 +8,7 @@ RUN go build -o backend
 
 
 
-FROM golang:1.23.0-bookworm AS deploy
+FROM alpine AS deploy
 COPY --from=builder /app/backend /
 
 ENTRYPOINT ["/backend"]
