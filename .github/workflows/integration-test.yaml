@@ -15,29 +15,23 @@ on:
         type: string
         required: true
 
+env:
+  KUBECONFIG: "${{ github.workspace }}/.kubeconfig"
+  KUBECONFIG_CONTENT: ${{ secrets.KUBECONFIG_CONTENT }}
+  WORKSTATION_ID: ${{ vars.WORKSTATION_ID }}
+
 jobs:
   deploy:
-    runs-on: ubuntu-22.04
-    environment: ${{ inputs.environment }}
-    env:
-      KUBECONFIG: "${{ github.workspace }}/.kubeconfig"
-      KUBECONFIG_CONTENT: ${{ secrets.KUBECONFIG_CONTENT }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: "Create kube config"
-        run: echo "$KUBECONFIG_CONTENT" | base64 -d > "$KUBECONFIG"
-      - run: sh ci/deploy.sh "$KUBECONFIG"
+    uses: ./.github/workflows/Deployment.yaml
+    secrets: inherit
+    with:
+      environment: ${{ inputs.environment }}
 
   test:
     runs-on: ubuntu-22.04
     environment: ${{ inputs.environment }}
     needs:
       - deploy
-    env:
-      KUBECONFIG: "${{ github.workspace }}/.kubeconfig"
-      KUBECONFIG_CONTENT: ${{ secrets.KUBECONFIG_CONTENT }}
-      WORKSTATION_ID: ${{ vars.WORKSTATION_ID }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - uses: actions/checkout@v4
@@ -55,3 +49,16 @@ jobs:
 
       - name: "Trying to curl endpoint"
         run: "./ci/integration_test/curl_endpoint.sh"
+
+  teardown:
+    runs-on: ubuntu-22.04
+    environment: ${{ inputs.environment }}
+    needs:
+      - test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Create kube config"
+        run: echo "$KUBECONFIG_CONTENT" | base64 -d > "$KUBECONFIG"
+
+      - run: sh ci/deploy.sh delete
