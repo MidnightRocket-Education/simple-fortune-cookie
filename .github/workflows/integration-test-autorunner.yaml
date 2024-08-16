@@ -1,11 +1,7 @@
 name: "Integration test autorunner"
-# This is for testing the pipeline only
-# Should be deleted before merge
+# Additionally run test automatically on pull_request to main
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
