@@ -1,0 +1,74 @@
+name: "Integration test"
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to run tests against'
+        type: environment
+        required: true
+      do_teardown:
+        description: 'Do teardown after the test'
+        type: boolean
+        default: false
+
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Environment to run tests against'
+        type: string
+        required: true
+      do_teardown:
+        description: 'Do teardown after the test'
+        type: boolean
+        default: false
+
+env:
+  KUBECONFIG: "${{ github.workspace }}/.kubeconfig"
+  KUBECONFIG_CONTENT: ${{ secrets.KUBECONFIG_CONTENT }}
+  WORKSTATION_ID: ${{ vars.WORKSTATION_ID }}
+
+jobs:
+  deploy:
+    uses: ./.github/workflows/Deployment.yaml
+    secrets: inherit
+    with:
+      environment: ${{ inputs.environment }}
+
+  test:
+    runs-on: ubuntu-22.04
+    environment: ${{ inputs.environment }}
+    needs:
+      - deploy
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Create kube config"
+        run: echo "$KUBECONFIG_CONTENT" | base64 -d > "$KUBECONFIG"
+
+      - name: debug
+        run: |
+          stat --printf="Kubeconfig size %s\n" "$KUBECONFIG"
+          printf "KUBECONFIG_CONTENT length: "
+          printf "%b" "$KUBECONFIG_CONTENT" | wc -c
+          echo "ENV: ${{ inputs.environment }}"
+          echo "WORKSTATION_ID $WORKSTATION_ID"
+
+      - name: "Trying to curl endpoint"
+        run: "./ci/integration_test/curl_endpoint.sh"
+
+  teardown:
+    name: Teardown test deployment
+    if: ${{ inputs.do_teardown }}
+    runs-on: ubuntu-22.04
+    environment: ${{ inputs.environment }}
+    needs:
+      - test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: "Create kube config"
+        run: echo "$KUBECONFIG_CONTENT" | base64 -d > "$KUBECONFIG"
+
+      - run: sh ci/deploy.sh delete

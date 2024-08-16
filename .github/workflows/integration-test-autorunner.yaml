@@ -1,0 +1,15 @@
+name: "Integration test autorunner"
+# Additionally run test automatically on pull_request to main
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    uses: ./.github/workflows/integration-test.yaml
+    secrets: inherit
+    with:
+      environment: testing
+      do_teardown: true
