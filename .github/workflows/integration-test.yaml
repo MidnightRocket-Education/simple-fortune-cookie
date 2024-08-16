@@ -7,6 +7,10 @@ on:
         description: 'Environment to run tests against'
         type: environment
         required: true
+      do_teardown:
+        description: 'Do teardown after the test'
+        type: boolean
+        default: false
 
   workflow_call:
     inputs:
@@ -14,6 +18,10 @@ on:
         description: 'Environment to run tests against'
         type: string
         required: true
+      do_teardown:
+        description: 'Do teardown after the test'
+        type: boolean
+        default: false
 
 env:
   KUBECONFIG: "${{ github.workspace }}/.kubeconfig"
@@ -51,6 +59,8 @@ jobs:
         run: "./ci/integration_test/curl_endpoint.sh"
 
   teardown:
+    name: Teardown test deployment
+    if: ${{ inputs.do_teardown }}
     runs-on: ubuntu-22.04
     environment: ${{ inputs.environment }}
     needs:

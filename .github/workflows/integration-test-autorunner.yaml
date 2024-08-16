@@ -12,3 +12,4 @@ jobs:
     secrets: inherit
     with:
       environment: testing
+      do_teardown: true
