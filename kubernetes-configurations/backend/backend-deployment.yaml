@@ -19,3 +19,8 @@ spec:
         name: backend-container
         ports:
           - containerPort: 9000
+        env:
+        - name: REDIS_DNS
+          value: redis-service
+        - name: REDIS_PORT
+          value: "6379"
