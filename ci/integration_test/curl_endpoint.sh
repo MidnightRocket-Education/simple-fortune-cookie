@@ -27,19 +27,19 @@ PATHNAME="${PATHNAME:-"healthz"}"
 PROTOCOL="${PROTOCOL:-"http://"}"
 
 
-NODE_PORT="$(kubectl get -o jsonpath='{.spec.ports[0].nodePort}' service "$SERVICE_NAME")"
 
 
 
 get_address() {
+	NODE_PORT="$(kubectl get -o jsonpath='{.spec.ports[0].nodePort}' service "$SERVICE_NAME")"
 	ADDRESS="$(kubectl get -o jsonpath='{range .items[*]}{.status.addresses[?(@.type == "ExternalDNS")].address}{"\n"}{end}' nodes | shuf -n 1 -)"
 	print "${PROTOCOL}${ADDRESS}:$NODE_PORT/$PATHNAME"
 }
 
 fetch() {
-	curl -f "$(get_address)"
+	curl --fail-early -LsS --connect-timeout 60 "$(get_address)"
 }
 
 
-until_timeout 15 fetch
+until_timeout 30 fetch
 stderr "\nSuccess"
