@@ -27,6 +27,7 @@ env:
   KUBECONFIG: "${{ github.workspace }}/.kubeconfig"
   KUBECONFIG_CONTENT: ${{ secrets.KUBECONFIG_CONTENT }}
   WORKSTATION_ID: ${{ vars.WORKSTATION_ID }}
+  ENVIRONMENT: ${{ inputs.environment }}
 
 jobs:
   deploy:
@@ -45,22 +46,17 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: "Create kube config"
-        run: echo "$KUBECONFIG_CONTENT" | base64 -d > "$KUBECONFIG"
+        run: "./ci/init_kubectl.sh"
 
-      - name: debug
-        run: |
-          stat --printf="Kubeconfig size %s\n" "$KUBECONFIG"
-          printf "KUBECONFIG_CONTENT length: "
-          printf "%b" "$KUBECONFIG_CONTENT" | wc -c
-          echo "ENV: ${{ inputs.environment }}"
-          echo "WORKSTATION_ID $WORKSTATION_ID"
+      - name: "Wait for deployment"
+        run: "sleep 60"
 
       - name: "Trying to curl endpoint"
         run: "./ci/integration_test/curl_endpoint.sh"
 
   teardown:
     name: Teardown test deployment
-    if: ${{ inputs.do_teardown }}
+    if: ${{ inputs.do_teardown && always() }}
     runs-on: ubuntu-22.04
     environment: ${{ inputs.environment }}
     needs:
@@ -69,6 +65,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: "Create kube config"
-        run: echo "$KUBECONFIG_CONTENT" | base64 -d > "$KUBECONFIG"
+        run: "./ci/init_kubectl.sh"
 
-      - run: sh ci/deploy.sh delete
+      - name: "Teardown deployment"
+        run: sh ci/deploy.sh delete

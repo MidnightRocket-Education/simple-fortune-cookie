@@ -22,10 +22,13 @@ jobs:
     env:
       KUBECONFIG: "${{ github.workspace }}/.kubeconfig"
       KUBECONFIG_CONTENT: ${{ secrets.KUBECONFIG_CONTENT }}
+      ENVIRONMENT: ${{ inputs.environment }}
+      WORKSTATION_ID: ${{ vars.WORKSTATION_ID }}
     steps:
       - uses: actions/checkout@v4
 
       - name: "Create kube config"
-        run: echo "$KUBECONFIG_CONTENT" | base64 -d > "$KUBECONFIG"
+        run: "./ci/init_kubectl.sh"
 
-      - run: sh ci/deploy.sh apply
+      - name: "Applying the deployment"
+        run: sh ci/deploy.sh apply
